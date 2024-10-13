@@ -103,8 +103,9 @@ class PerplexityLLMHandler:
 
 
 # Example of using the handler in a Streamlit app or test case
-def generate_itinerary_from_profile(api_key, destination, start_date, end_date, interests, travel_type, budget, use_mock=False):
-    # Initialize the handler with your actual API key
+def generate_itinerary_from_profile(destination, start_date, end_date, interests, travel_type, budget,
+                                    api_key="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", use_mock=False):
+    # Initialize the handler with actual API key
     handler = PerplexityLLMHandler(api_key=api_key, use_mock=use_mock)
 
     # User travel preferences - these will be passed as a JSON object to the Perplexity API
