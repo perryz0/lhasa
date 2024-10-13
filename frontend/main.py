@@ -35,7 +35,7 @@ def dict_to_html(d, level=0):
 
 # Set page configuration
 st.set_page_config(
-    page_title="Lhasa: AI-Powered Itinerary Planner",
+    page_title="Lhasa Itinerary Planner",
     page_icon="🗺️",
     layout="centered",
     initial_sidebar_state="auto",
@@ -46,7 +46,7 @@ if 'uploaded_file' not in st.session_state:
     st.session_state['uploaded_file'] = None
 
 # Title of the app
-st.title(":mountain: **Lhasa**: AI-Powered Travel Itinerary Planner")
+st.title(":mountain: :green[**Lhasa**] AI-Powered Travel Itinerary Planner")
 
 st.markdown("""
 **Plan your perfect trip** with Lhasa's AI-driven itinerary generator. Whether you're planning a weekend getaway or a multi-country adventure, Lhasa helps you create a customized and memorable travel experience.
@@ -102,12 +102,12 @@ if mode == 'Start from scratch':
 
         start_date = st.date_input(
             "Start Date",
-            help="Select the date when your trip will begin."
+            help="Select the start date of your trip."
         )
 
         end_date = st.date_input(
             "End Date",
-            help="Select the date when your trip will end."
+            help="Select the end date of your trip."
         )
 
         interests = st.text_area(
