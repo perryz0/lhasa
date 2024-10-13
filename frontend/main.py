@@ -190,6 +190,7 @@ elif mode == 'Community Itineraries':
             i += 1
 
 # Simple dashboard for saved itineraries
+st.divider()
 st.write("## My Itineraries")
 
 # Section for Saved Itineraries
