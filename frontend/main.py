@@ -86,28 +86,34 @@ def store_itinerary(itinerary_data):
     try:
         result = collection.insert_one(itinerary_data)
         st.session_state['selected_itinerary'] = itinerary_data  # Save to session state
-        st.success(f"Your selected itinerary has been successfully shared! Document ID: {result.inserted_id}")
+        st.success(f"Your selected itinerary has been successfully saved! Document ID: {result.inserted_id}")
     except Exception as e:
         st.error(f"Failed to store itinerary: {e}")
 
 # Helper function to render and handle example itineraries
 def render_example_itineraries(example_itineraries):
-    col1, col2, col3 = st.columns(3)
+    if st.session_state.get('selected_itinerary'):
+        # Show success message when an itinerary is selected
+        selected_itinerary = st.session_state['selected_itinerary']
+        st.success(f"Selected itinerary for {selected_itinerary['destination']} has been saved successfully!")
+    else:
+        # Show the itineraries as options if none has been selected
+        col1, col2, col3 = st.columns(3)
 
-    for col, itinerary in zip([col1, col2, col3], example_itineraries):
-        with col:
-            st.subheader(f"{itinerary['destination']}")
-            st.write(f"**Dates**: {itinerary['dates']}")
-            st.write(f"**Budget**: ${itinerary['budget']}")
-            st.write(f"**Type**: {itinerary['travel_type']}")
-            st.write("**Activities**:")
-            for activity in itinerary['activities']:
-                st.write(f"- {activity}")
-            if st.button(f"Choose {itinerary['destination']} Itinerary"):
-                st.session_state['selected_itinerary'] = itinerary
-                store_itinerary(itinerary)
-                st.success(f"Selected itinerary for {itinerary['destination']} has been shared successfully!")
-                st.experimental_rerun()  # Rerun to hide options after selection
+        for col, itinerary in zip([col1, col2, col3], example_itineraries):
+            with col:
+                st.subheader(f"{itinerary['destination']}")
+                st.write(f"**Dates**: {itinerary['dates']}")
+                st.write(f"**Budget**: ${itinerary['budget']}")
+                st.write(f"**Type**: {itinerary['travel_type']}")
+                st.write("**Activities**:")
+                for activity in itinerary['activities']:
+                    st.write(f"- {activity}")
+                if st.button(f"Choose {itinerary['destination']} Itinerary"):
+                    st.session_state['selected_itinerary'] = itinerary
+                    store_itinerary(itinerary)  # Save to database
+                    st.success(f"Selected itinerary for {itinerary['destination']} has been saved successfully!")
+                    # No need for rerun, the UI will update with session state change
 
 # Select between modes of itinerary planning
 st.subheader("How would you like to start?")
@@ -177,7 +183,7 @@ if mode == 'Start from scratch':
                         ]
                         render_example_itineraries(example_itineraries)
                     else:
-                        st.success(f"Selected itinerary for {st.session_state['selected_itinerary']['destination']} has been shared successfully!")
+                        st.success(f"Selected itinerary for {st.session_state['selected_itinerary']['destination']} has been saved successfully!")
 
             except Exception as e:
                 st.error(f"Error generating itinerary: {e}")
