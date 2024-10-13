@@ -23,19 +23,23 @@ class PerplexityLLMHandler:
             # Raise an exception if the API call fails
             raise Exception(f"API call failed: {response.status_code} - {response.text}")
 
-# Example of using the handler
-# Initialize the handler with your actual API key
-handler = PerplexityLLMHandler(api_key="pplx-e0a9601780b78e0825c85b74f452b79dd794f43a5239a8130")
+# Example of using the handler in a Streamlit app
 
-# User travel preferences
-preferences = {
-    'destination': 'Paris',
-    'budget': 1500,
-    'interests': ['hiking', 'art'],
-    'start_date': '2024-10-15',
-    'end_date': '2024-10-25'
-}
+def generate_itinerary_from_profile(api_key, destination, start_date, end_date, interests, travel_type, budget):
+    # Initialize the handler with your actual API key
+    handler = PerplexityLLMHandler(api_key=api_key)
 
-# Call the function to get the itinerary
-itinerary = handler.get_itinerary(preferences)
-print(itinerary)
+    # User travel preferences - these will be passed as a JSON object to the Perplexity API
+    preferences = {
+        'destination': destination,
+        'start_date': str(start_date),
+        'end_date': str(end_date),
+        'interests': interests.split(','),  # Split interests into a list
+        'travel_type': travel_type,
+        'budget': budget
+    }
+
+    # Call the function to get the itinerary from Perplexity API
+    itinerary = handler.get_itinerary(preferences)
+    return itinerary
+
