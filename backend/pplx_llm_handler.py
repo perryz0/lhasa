@@ -4,7 +4,7 @@ import requests
 class PerplexityLLMHandler:
     def __init__(self, api_key):
         # Use the correct Perplexity API endpoint (replace with the actual endpoint when testing real calls)
-        self.api_url = "https://api.perplexity.ai/v1/generate_itinerary"  # Hypothetical endpoint, adjust as needed
+        self.api_url = "https://api.perplexity.ai/chat/completions"     # Revised the endpoint url based on PPLX API docs
         self.api_key = api_key
 
     def get_itinerary(self, preferences):
