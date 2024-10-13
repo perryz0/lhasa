@@ -35,7 +35,7 @@ community_itineraries = [
         'username': 'traveler123',
         'destination': 'Kyoto, Japan',
         'dates': '2024-04-01 to 2024-04-10',
-        'budget': 2000,
+        'budget': 2100,
         'travel_type': 'Cultural',
         'activities': ['Visit Kinkaku-ji Temple', 'Attend Tea Ceremony', 'Explore Gion District']
     },
@@ -49,10 +49,10 @@ community_itineraries = [
     },
     {
         'username': 'luxury_traveler',
-        'destination': 'Paris, France',
-        'dates': '2024-09-01 to 2024-09-07',
-        'budget': 5000,
+        'destination': 'Dubai, UAE',
+        'dates': '2024-05-10 to 2024-05-15',
+        'budget': 5600,
         'travel_type': 'Luxury',
-        'activities': ['Stay at Ritz Paris', 'Private Louvre Tour', 'Dinner Cruise on Seine River']
+        'activities': ['Visit Burj Khalifa', 'Desert Safari with Dune Bashing & Camel Ride', 'Dhow Cruise on Dubai Creek']
     }
 ]
