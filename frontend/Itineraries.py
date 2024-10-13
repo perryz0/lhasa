@@ -1,3 +1,34 @@
+# Simulating saved and followed itineraries
+saved_itineraries = [
+    {
+        'destination': 'Paris, France',
+        'start_date': '2022-11-01',
+        'end_date': '2022-11-07',
+        'travel_type': 'Cultural',
+        'budget': 3000,
+        'activities': ['Visit Louvre', 'Eiffel Tower Sightseeing', 'Seine River Cruise']
+    },
+    {
+        'destination': 'Tokyo, Japan',
+        'start_date': '2023-12-10',
+        'end_date': '2023-12-15',
+        'travel_type': 'Adventure',
+        'budget': 2000,
+        'activities': ['Mount Fuji Hike', 'Visit Shibuya Crossing', 'Sushi Omakase Tasting']
+    }
+]
+
+followed_itineraries = [
+    {
+        'destination': 'New York, USA',
+        'start_date': '2024-10-19',
+        'end_date': '2024-3-23',
+        'travel_type': 'Business',
+        'budget': 1500,
+        'activities': ['Attend Business Conference', 'Central Park Walk', 'Attend Broadway Show']
+    }
+]
+
 # Example community feed data
 community_itineraries = [
     {
