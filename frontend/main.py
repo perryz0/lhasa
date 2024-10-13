@@ -1,6 +1,13 @@
 import streamlit as st
 import requests
-from backend.pplx_llm_handler import generate_itinerary_from_profile
+import sys
+import os
+
+# Add the 'backend' directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'backend')))
+
+# Import the handler
+from pplx_llm_handler import generate_itinerary_from_profile
 import json
 
 # Helper function to format itinerary data in markdown
