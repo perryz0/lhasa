@@ -26,16 +26,17 @@ if 'uploaded_file' not in st.session_state:
 # Sidebar for login/logout
 with st.sidebar:
     st.title("User Login")
-    
-    # Simulate a login/logout button with session state
+
+    # Initialize session state for login status
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
 
+    # Check login status
     if st.session_state['logged_in']:
         st.sidebar.success("Logged in as User")
         if st.sidebar.button("Logout"):
             st.session_state['logged_in'] = False
-            st.sidebar.warning("You have logged out.")
+            st.rerun()  # Force rerun to immediately reflect the logged-out state
     else:
         username = st.sidebar.text_input("Username")
         password = st.sidebar.text_input("Password", type="password")
@@ -43,8 +44,10 @@ with st.sidebar:
             if username == "admin" and password == "password":  # Replace with real authentication
                 st.session_state['logged_in'] = True
                 st.sidebar.success("Login successful!")
+                st.rerun()  # Force rerun to immediately reflect the logged-in state
             else:
                 st.sidebar.error("Invalid credentials")
+    
 
 # Title of the app
 st.title(":mountain: :green[**Lhasa**] Smart Travel Hub")
