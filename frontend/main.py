@@ -110,18 +110,33 @@ if mode == 'Start from scratch':
         
         # Display spinner while processing
         with st.spinner('Generating your personalized itinerary...'):
-            response = requests.post('http://127.0.0.1:5000/submit_itinerary', data=travel_data)
-            if response.status_code == 200:
-                st.success('Your itinerary has been generated successfully!')
-                itinerary = response.json()
-                html_data = dict_to_html(itinerary)
-                st.markdown(html_data, unsafe_allow_html=True)
-                
-                # Option to save itinerary to the community feed
-                if share_itinerary:
-                    st.success("Your itinerary has been shared with the community!")
-            else:
-                st.error('Error generating the itinerary.')
+            # Call the Perplexity LLM handler here
+            try:
+                itinerary = generate_itinerary_from_profile(
+                    api_key="pplx-e0a9601780b78e0825c85b74f452b79dd794f43a5239a8130",  # Your actual API key
+                    destination=travel_data['destination'],
+                    start_date=travel_data['start_date'],
+                    end_date=travel_data['end_date'],
+                    interests=travel_data['interests'],
+                    travel_type=travel_data['travel_type'],
+                    budget=travel_data['budget']
+                )
+
+                # Display the generated itinerary
+                if itinerary:
+                    st.success('Your itinerary has been generated successfully!')
+                    html_data = dict_to_html(itinerary)
+                    st.markdown(html_data, unsafe_allow_html=True)
+
+                    # Option to save itinerary to the community feed
+                    if share_itinerary:
+                        st.success("Your itinerary has been shared with the community!")
+                        
+                else:
+                    st.error("Itinerary generation failed. Please try again.")
+
+            except Exception as e:
+                st.error(f"Error generating itinerary: {e}")
 
 # Explore shared itineraries (community feed)
 elif mode == 'Upload preferences file':
@@ -175,6 +190,7 @@ elif mode == 'Community Itineraries':
             i += 1
 
 # Simple dashboard for saved itineraries
+st.divider()
 st.write("## My Itineraries")
 
 # Section for Saved Itineraries
@@ -231,45 +247,3 @@ if notifications:
         st.write(notification)
 else:
     st.write("No new notifications.")
-
-
-# for backend
-if submit_profile_button:
-    travel_data = {
-        'destination': destination,
-        'start_date': start_date,
-        'end_date': end_date,
-        'interests': interests,
-        'travel_type': travel_type,
-        'budget': budget
-    }
-    
-    # Display spinner while processing
-    with st.spinner('Generating your personalized itinerary...'):
-        # Call the Perplexity LLM handler here
-        try:
-            itinerary = generate_itinerary_from_profile(
-                api_key="pplx-e0a9601780b78e0825c85b74f452b79dd794f43a5239a8130",  # Your actual API key
-                destination=travel_data['destination'],
-                start_date=travel_data['start_date'],
-                end_date=travel_data['end_date'],
-                interests=travel_data['interests'],
-                travel_type=travel_data['travel_type'],
-                budget=travel_data['budget']
-            )
-
-            # Display the generated itinerary
-            if itinerary:
-                st.success('Your itinerary has been generated successfully!')
-                html_data = dict_to_html(itinerary)
-                st.markdown(html_data, unsafe_allow_html=True)
-
-                # Option to save itinerary to the community feed
-                if share_itinerary:
-                    st.success("Your itinerary has been shared with the community!")
-                    
-            else:
-                st.error("Itinerary generation failed. Please try again.")
-
-        except Exception as e:
-            st.error(f"Error generating itinerary: {e}")
