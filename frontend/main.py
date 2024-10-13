@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+from backend.pplx_llm_handler import generate_itinerary_from_profile
 import json
 
 # Helper function to format itinerary data in markdown
@@ -30,12 +31,18 @@ with st.sidebar:
     # Initialize session state for login status
     if 'logged_in' not in st.session_state:
         st.session_state['logged_in'] = False
+    if 'username' not in st.session_state:
+        st.session_state['username'] = None
 
     # Check login status
     if st.session_state['logged_in']:
-        st.sidebar.success("Logged in as User")
+        st.success(f"Logged in as {st.session_state['username']}")
+        
+        # Profile actions (can be extended with real functionality)
+        st.button("Update Profile")
         if st.sidebar.button("Logout"):
             st.session_state['logged_in'] = False
+            st.session_state['username'] = None
             st.rerun()  # Force rerun to immediately reflect the logged-out state
     else:
         username = st.sidebar.text_input("Username")
@@ -43,6 +50,7 @@ with st.sidebar:
         if st.sidebar.button("Login"):
             if username == "admin" and password == "password":  # Replace with real authentication
                 st.session_state['logged_in'] = True
+                st.session_state['username'] = username
                 st.sidebar.success("Login successful!")
                 st.rerun()  # Force rerun to immediately reflect the logged-in state
             else:
@@ -164,7 +172,7 @@ followed_itineraries = [
     }
 ]
 
-st.subheader("My Itineraries")
+st.write("## My Itineraries")
 
 # Section for Saved Itineraries
 st.write("### Saved Itineraries")
@@ -220,3 +228,44 @@ if notifications:
         st.write(notification)
 else:
     st.write("No new notifications.")
+
+
+if submit_profile_button:
+    travel_data = {
+        'destination': destination,
+        'start_date': start_date,
+        'end_date': end_date,
+        'interests': interests,
+        'travel_type': travel_type,
+        'budget': budget
+    }
+    
+    # Display spinner while processing
+    with st.spinner('Generating your personalized itinerary...'):
+        # Call the Perplexity LLM handler here
+        try:
+            itinerary = generate_itinerary_from_profile(
+                api_key="pplx-e0a9601780b78e0825c85b74f452b79dd794f43a5239a8130",  # Your actual API key
+                destination=travel_data['destination'],
+                start_date=travel_data['start_date'],
+                end_date=travel_data['end_date'],
+                interests=travel_data['interests'],
+                travel_type=travel_data['travel_type'],
+                budget=travel_data['budget']
+            )
+
+            # Display the generated itinerary
+            if itinerary:
+                st.success('Your itinerary has been generated successfully!')
+                html_data = dict_to_html(itinerary)
+                st.markdown(html_data, unsafe_allow_html=True)
+
+                # Option to save itinerary to the community feed
+                if share_itinerary:
+                    st.success("Your itinerary has been shared with the community!")
+                    
+            else:
+                st.error("Itinerary generation failed. Please try again.")
+
+        except Exception as e:
+            st.error(f"Error generating itinerary: {e}")
