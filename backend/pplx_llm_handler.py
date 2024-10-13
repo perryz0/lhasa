@@ -2,10 +2,11 @@
 import requests
 
 class PerplexityLLMHandler:
-    def __init__(self, api_key):
-        # Use the correct Perplexity API endpoint (replace with the actual endpoint when testing real calls)
-        self.api_url = "https://api.perplexity.ai/chat/completions"     # Revised the endpoint url based on PPLX API docs
+    def __init__(self, api_key, use_mock=False):
+        # Use the correct Perplexity API endpoint
+        self.api_url = "https://api.perplexity.ai/chat/completions"  # Correct endpoint from the API docs
         self.api_key = api_key
+        self.use_mock = use_mock  # Control whether to use mock responses or real API calls
 
     def get_itinerary(self, preferences):
         # Set up headers for API call
@@ -14,18 +15,45 @@ class PerplexityLLMHandler:
             'Content-Type': 'application/json',
         }
         
-        # Real API call, commented out for now
-        # response = requests.post(self.api_url, json=preferences, headers=headers)
+        # Prepare the payload based on the API specifications
+        payload = {
+            "model": "llama-3.1-sonar-small-128k-online",  # Replace with actual model, if needed
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "Generate an optimal travel itinerary based on the user preferences."
+                },
+                {
+                    "role": "user",
+                    "content": (
+                        f"Generate a travel itinerary for {preferences.get('destination')} from "
+                        f"{preferences.get('start_date')} to {preferences.get('end_date')} with interests "
+                        f"in {', '.join(preferences.get('interests', []))} and a budget of {preferences.get('budget')}."
+                    )
+                }
+            ],
+            "temperature": 0.2,
+            "top_p": 0.9,
+            "return_citations": False,
+            "return_images": False,
+            "return_related_questions": False,
+        }
 
-        # Mock response to simulate an API call for testing purposes
-        response = self.mock_response(preferences)
-        
-        if response['status_code'] == 200:
-            # Return the generated itinerary from the response
-            return response['data']
+        if self.use_mock:
+            # Mock response to simulate an API call for testing purposes
+            response = self.mock_response(preferences)
         else:
-            # Raise an exception if the API call fails
-            raise Exception(f"API call failed: {response['status_code']} - {response['message']}")
+            # Make the real API call
+            response = requests.post(self.api_url, json=payload, headers=headers)
+
+            # Check if the response is valid
+            if response.status_code == 200:
+                response = response.json()
+            else:
+                raise Exception(f"API call failed: {response.status_code} - {response.text}")
+        
+        # Return the generated itinerary from the response
+        return response['data']
 
     def mock_response(self, preferences):
         """Mock function to simulate a successful API call."""
@@ -52,11 +80,11 @@ class PerplexityLLMHandler:
         }
         return mock_data
 
-# Example of using the handler in a Streamlit app or test case
 
-def generate_itinerary_from_profile(api_key, destination, start_date, end_date, interests, travel_type, budget):
+# Example of using the handler in a Streamlit app or test case
+def generate_itinerary_from_profile(api_key, destination, start_date, end_date, interests, travel_type, budget, use_mock=False):
     # Initialize the handler with your actual API key
-    handler = PerplexityLLMHandler(api_key=api_key)
+    handler = PerplexityLLMHandler(api_key=api_key, use_mock=use_mock)
 
     # User travel preferences - these will be passed as a JSON object to the Perplexity API
     preferences = {
@@ -68,6 +96,6 @@ def generate_itinerary_from_profile(api_key, destination, start_date, end_date, 
         'budget': budget
     }
 
-    # Call the function to get the itinerary from Perplexity API (mocked in this case)
+    # Call the function to get the itinerary from Perplexity API (mocked or real based on `use_mock`)
     itinerary = handler.get_itinerary(preferences)
     return itinerary
