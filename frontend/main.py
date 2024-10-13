@@ -104,8 +104,84 @@ elif mode == 'Upload preferences file':
             st.button(f"Follow Itinerary {i + 1}")
 
 # Simple dashboard for saved itineraries
+# st.subheader("My Itineraries")
+# st.write("List of saved and followed itineraries")
+
+# Simulating saved and followed itineraries
+saved_itineraries = [
+    {
+        'destination': 'Paris, France',
+        'start_date': '2022-11-01',
+        'end_date': '2022-11-07',
+        'travel_type': 'Cultural',
+        'budget': 3000,
+        'activities': ['Visit Louvre', 'Eiffel Tower Sightseeing', 'Seine River Cruise']
+    },
+    {
+        'destination': 'Tokyo, Japan',
+        'start_date': '2023-12-10',
+        'end_date': '2023-12-15',
+        'travel_type': 'Adventure',
+        'budget': 2000,
+        'activities': ['Mount Fuji Hike', 'Visit Shibuya Crossing', 'Sushi Omakase Tasting']
+    }
+]
+
+followed_itineraries = [
+    {
+        'destination': 'New York, USA',
+        'start_date': '2024-10-19',
+        'end_date': '2024-3-23',
+        'travel_type': 'Business',
+        'budget': 1500,
+        'activities': ['Attend Business Conference', 'Central Park Walk', 'Attend Broadway Show']
+    }
+]
+
 st.subheader("My Itineraries")
-st.write("List of saved and followed itineraries")
+
+# Section for Saved Itineraries
+st.write("### Saved Itineraries")
+if saved_itineraries:
+    i = ""
+    for idx, itinerary in enumerate(saved_itineraries):
+        i += " "
+        with st.expander(f"🗺️ {itinerary['destination']} ({itinerary['start_date']} - {itinerary['end_date']})"):
+            st.markdown(f"**Travel Type**: {itinerary['travel_type']}")
+            st.markdown(f"**Budget**: ${itinerary['budget']}")
+            st.markdown("**Activities**:")
+            for activity in itinerary['activities']:
+                st.write(f"- {activity}")
+            # Buttons for itinerary actions
+            if st.button(f"View Details", key="details"+i):
+                st.info(f"Viewing details of {itinerary['destination']}")
+                # You can add more detailed views like maps, itineraries per day, etc.
+            if st.button(f"Edit Itinerary", key="edit"+i):
+                st.info(f"Editing {itinerary['destination']}")
+                # You could redirect to an editing form (not implemented in this example)
+            if st.button(f"Delete Itinerary", key="delete"+i):
+                st.warning(f"{itinerary['destination']} deleted!")
+                # Logic to delete the itinerary from the database/session state would go here.
+else:
+    st.write("You have no saved itineraries yet.")
+
+# Section for Followed Itineraries
+st.write("### Followed Itineraries")
+if followed_itineraries:
+    for idx, itinerary in enumerate(followed_itineraries):
+        with st.expander(f"📍 {itinerary['destination']} ({itinerary['start_date']} - {itinerary['end_date']})"):
+            st.markdown(f"**Travel Type**: {itinerary['travel_type']}")
+            st.markdown(f"**Budget**: ${itinerary['budget']}")
+            st.markdown("**Activities**:")
+            for activity in itinerary['activities']:
+                st.write(f"- {activity}")
+            # Option to unfollow an itinerary
+            if st.button(f"Unfollow Itinerary"):
+                st.warning(f"You unfollowed {itinerary['destination']}.")
+                # Logic to unfollow (e.g., remove from session or database) goes here.
+else:
+    st.write("You are not following any itineraries yet.")
+
 
 # Future feature: Notifications section for when users interact with your itinerary
 if 'notifications' not in st.session_state:
