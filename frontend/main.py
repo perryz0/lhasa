@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import sys
 import os
+import pymongo  # MongoDB
 
 # Add the 'backend' directory to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'backend')))
@@ -10,6 +11,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'b
 from pplx_llm_handler import generate_itinerary_from_profile
 import Itineraries as it
 import json
+
+# MongoDB connection setup
+client = pymongo.MongoClient("mongodb+srv://perryz0:peiru123@cluster0.402ih.mongodb.net/?retryWrites=true&w=majority")
+db = client["lhasa_travel_db"]
+collection = db["itineraries"]
 
 # Helper function to format itinerary data in markdown
 def dict_to_markdown(d, level=0):
@@ -31,6 +37,9 @@ st.set_page_config(
 # Initialize session state variables
 if 'uploaded_file' not in st.session_state:
     st.session_state['uploaded_file'] = None
+
+if 'selected_itinerary' not in st.session_state:
+    st.session_state['selected_itinerary'] = None
 
 # Sidebar for login/logout
 with st.sidebar:
@@ -71,6 +80,34 @@ st.title(":mountain: :green[**Lhasa**] Smart Travel Hub")
 st.markdown("""
 **Plan your perfect trip** with Lhasa's AI-driven itinerary generator. Whether you're planning a weekend getaway or a multi-country adventure, Lhasa helps you create a customized and memorable travel experience.
 """)
+
+# Step 3: When an itinerary is shared, show a success message
+def store_itinerary(itinerary_data):
+    try:
+        result = collection.insert_one(itinerary_data)
+        st.session_state['selected_itinerary'] = itinerary_data  # Save to session state
+        st.success(f"Your selected itinerary has been successfully shared! Document ID: {result.inserted_id}")
+    except Exception as e:
+        st.error(f"Failed to store itinerary: {e}")
+
+# Helper function to render and handle example itineraries
+def render_example_itineraries(example_itineraries):
+    col1, col2, col3 = st.columns(3)
+
+    for col, itinerary in zip([col1, col2, col3], example_itineraries):
+        with col:
+            st.subheader(f"{itinerary['destination']}")
+            st.write(f"**Dates**: {itinerary['dates']}")
+            st.write(f"**Budget**: ${itinerary['budget']}")
+            st.write(f"**Type**: {itinerary['travel_type']}")
+            st.write("**Activities**:")
+            for activity in itinerary['activities']:
+                st.write(f"- {activity}")
+            if st.button(f"Choose {itinerary['destination']} Itinerary"):
+                st.session_state['selected_itinerary'] = itinerary
+                store_itinerary(itinerary)
+                st.success(f"Selected itinerary for {itinerary['destination']} has been shared successfully!")
+                st.experimental_rerun()  # Rerun to hide options after selection
 
 # Select between modes of itinerary planning
 st.subheader("How would you like to start?")
@@ -122,85 +159,25 @@ if mode == 'Start from scratch':
                     budget=travel_data['budget']
                 )
 
-                # Display the generated itinerary
+                # Main logic for itinerary selection
                 if itinerary:
                     st.success('Your itinerary has been generated successfully!')
                     html_data = dict_to_html(itinerary)
                     st.markdown(html_data, unsafe_allow_html=True)
 
-                    # Option to save itinerary to the community feed
-                    if share_itinerary:
-                        st.success("Your itinerary has been shared with the community!")
-
-                    # Show example itineraries after successful generation
-                    st.markdown("### Example Itineraries You May Like")
-                    
-                    # Example itineraries
-                    example_itineraries = [
-                        {
-                            'username': 'dubai_explorer',
-                            'destination': 'Dubai, UAE',
-                            'dates': '2024-05-10 to 2024-05-15',
-                            'budget': 2500,
-                            'travel_type': 'Adventure',
-                            'activities': ['Visit Burj Khalifa', 'Desert Safari with Dune Bashing & Camel Ride', 'Dhow Cruise on Dubai Creek']
-                        },
-                        {
-                            'username': 'parisian_lover',
-                            'destination': 'Paris, France',
-                            'dates': '2024-06-01 to 2024-06-07',
-                            'budget': 4000,
-                            'travel_type': 'Romantic',
-                            'activities': ['Visit Eiffel Tower', 'Louvre Museum', 'Seine River Dinner Cruise']
-                        },
-                        {
-                            'username': 'tokyo_adventurer',
-                            'destination': 'Tokyo, Japan',
-                            'dates': '2024-07-15 to 2024-07-22',
-                            'budget': 3000,
-                            'travel_type': 'Cultural',
-                            'activities': ['Visit Shibuya Crossing', 'Explore Meiji Shrine', 'Day Trip to Mount Fuji']
-                        }
-                    ]
-                    
-                    # Use columns to line up the three example itineraries
-                    col1, col2, col3 = st.columns(3)
-
-                    # First itinerary
-                    with col1:
-                        st.subheader(f"{example_itineraries[0]['destination']}")
-                        st.write(f"**Dates**: {example_itineraries[0]['dates']}")
-                        st.write(f"**Budget**: ${example_itineraries[0]['budget']}")
-                        st.write(f"**Type**: {example_itineraries[0]['travel_type']}")
-                        st.write("**Activities**:")
-                        for activity in example_itineraries[0]['activities']:
-                            st.write(f"- {activity}")
-                        st.button(f"Choose {example_itineraries[0]['destination']} Itinerary")
-
-                    # Second itinerary
-                    with col2:
-                        st.subheader(f"{example_itineraries[1]['destination']}")
-                        st.write(f"**Dates**: {example_itineraries[1]['dates']}")
-                        st.write(f"**Budget**: ${example_itineraries[1]['budget']}")
-                        st.write(f"**Type**: {example_itineraries[1]['travel_type']}")
-                        st.write("**Activities**:")
-                        for activity in example_itineraries[1]['activities']:
-                            st.write(f"- {activity}")
-                        st.button(f"Choose {example_itineraries[1]['destination']} Itinerary")
-
-                    # Third itinerary
-                    with col3:
-                        st.subheader(f"{example_itineraries[2]['destination']}")
-                        st.write(f"**Dates**: {example_itineraries[2]['dates']}")
-                        st.write(f"**Budget**: ${example_itineraries[2]['budget']}")
-                        st.write(f"**Type**: {example_itineraries[2]['travel_type']}")
-                        st.write("**Activities**:")
-                        for activity in example_itineraries[2]['activities']:
-                            st.write(f"- {activity}")
-                        st.button(f"Choose {example_itineraries[2]['destination']} Itinerary")
-                                
-                else:
-                    st.error("Itinerary generation failed. Please try again.")
+                    if st.session_state['selected_itinerary'] is None:
+                        st.markdown("### Example Itineraries You May Like")
+                        example_itineraries = [
+                            {'username': 'dubai_explorer', 'destination': 'Dubai, UAE', 'dates': '2024-05-10 to 2024-05-15', 'budget': 2500,
+                            'travel_type': 'Adventure', 'activities': ['Visit Burj Khalifa', 'Desert Safari', 'Dhow Cruise']},
+                            {'username': 'parisian_lover', 'destination': 'Paris, France', 'dates': '2024-06-01 to 2024-06-07', 'budget': 4000,
+                            'travel_type': 'Romantic', 'activities': ['Visit Eiffel Tower', 'Louvre Museum', 'Seine River Cruise']},
+                            {'username': 'tokyo_adventurer', 'destination': 'Tokyo, Japan', 'dates': '2024-07-15 to 2024-07-22', 'budget': 3000,
+                            'travel_type': 'Cultural', 'activities': ['Visit Shibuya Crossing', 'Explore Meiji Shrine', 'Mount Fuji Day Trip']}
+                        ]
+                        render_example_itineraries(example_itineraries)
+                    else:
+                        st.success(f"Selected itinerary for {st.session_state['selected_itinerary']['destination']} has been shared successfully!")
 
             except Exception as e:
                 st.error(f"Error generating itinerary: {e}")
