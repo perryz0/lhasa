@@ -8,6 +8,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'b
 
 # Import the handler
 from pplx_llm_handler import generate_itinerary_from_profile
+import feedData as feed
 import json
 
 # Helper function to format itinerary data in markdown
@@ -236,7 +237,23 @@ if notifications:
 else:
     st.write("No new notifications.")
 
+# Main content: Community Feed
+st.title("Community Itineraries")
+st.subheader("Explore Itineraries Shared by the Lhasa Community")
 
+# Loop through example itineraries and display them in expandable cards
+for itinerary in feed.community_itineraries:
+    with st.expander(f"🌍 {itinerary['destination']} ({itinerary['dates']}) by {itinerary['username']}"):
+        st.write(f"**Travel Type**: {itinerary['travel_type']}")
+        st.write(f"**Budget**: ${itinerary['budget']}")
+        st.write("**Activities**:")
+        for activity in itinerary['activities']:
+            st.write(f"- {activity}")
+        if st.button(f"Follow {itinerary['username']}'s Itinerary", key=itinerary['username']):
+            st.success(f"You are now following {itinerary['username']}'s itinerary!")
+
+
+# for backend
 if submit_profile_button:
     travel_data = {
         'destination': destination,
