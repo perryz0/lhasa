@@ -1,5 +1,6 @@
 # Import necessary libraries
 import requests
+import json
 
 class PerplexityLLMHandler:
     def __init__(self, api_key, use_mock=False):
@@ -52,8 +53,29 @@ class PerplexityLLMHandler:
             else:
                 raise Exception(f"API call failed: {response.status_code} - {response.text}")
         
-        # Return the generated itineraries from the response
-        return response['data']
+        # Process and parse the text response into three JSON objects
+        parsed_itineraries = self.parse_response(response['data'])
+        return parsed_itineraries
+
+    def parse_response(self, text_data):
+        """Parses the Perplexity response into three distinct itinerary JSONs."""
+        # Example parsing logic - assumes you can identify start/end points of each itinerary
+        itineraries = text_data.split('Mid-Range Itinerary')  # Split based on keywords like "Mid-Range Itinerary"
+        
+        itinerary_1 = {
+            "itinerary": itineraries[0].strip(),
+            "option": "Budget-Friendly Itinerary"
+        }
+        itinerary_2 = {
+            "itinerary": itineraries[1].strip(),
+            "option": "Mid-Range Itinerary"
+        }
+        itinerary_3 = {
+            "itinerary": itineraries[2].strip(),
+            "option": "Luxury History Buff Itinerary"
+        }
+
+        return [itinerary_1, itinerary_2, itinerary_3]
 
     def mock_response(self, preferences):
         """Mock function to simulate a successful API call returning three itinerary options."""
