@@ -4,8 +4,8 @@ from pplx_llm_handler import PerplexityLLMHandler, generate_itinerary_from_profi
 class TestPerplexityLLMHandler(unittest.TestCase):
 
     def setUp(self):
-        # Set your API key here (use your actual key for real tests)
-        self.api_key = "pplx-your-api-key-here"
+        # Set actual API key here
+        self.api_key = "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"
         
         # Initialize the Perplexity handler with the API key (use_mock=True for testing)
         self.handler = PerplexityLLMHandler(api_key=self.api_key, use_mock=True)
