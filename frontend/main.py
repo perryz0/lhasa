@@ -8,7 +8,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'b
 
 # Import the handler
 from pplx_llm_handler import generate_itinerary_from_profile
-import feedData as feed
+import Itineraries as it
 import json
 
 # Helper function to format itinerary data in markdown
@@ -74,7 +74,7 @@ st.markdown("""
 
 # Select between modes of itinerary planning
 st.subheader("How would you like to start?")
-mode = st.radio("", ['Start from scratch', 'Upload preferences file'])
+mode = st.radio("", ['Start from scratch', 'Upload preferences file', 'Community Itineraries'])
 
 if mode == 'Start from scratch':
     st.subheader("Enter Your Travel Information")
@@ -125,68 +125,59 @@ if mode == 'Start from scratch':
 
 # Explore shared itineraries (community feed)
 elif mode == 'Upload preferences file':
+    st.subheader("Upload a preferences file for faster itinerary generation")
+
+    # Upload preferences JSON file
+    uploaded_file = st.file_uploader("Upload your preferences (JSON format)...", type=["json"], key='preferences_file_uploader')
+
+    if st.button('Generate Itinerary from Preferences'):
+        if uploaded_file is not None:
+            with st.spinner('Generating itinerary from preferences...'):
+                files = {'file': uploaded_file.getvalue()}
+                response = requests.post('http://127.0.0.1:5000/submit_preferences', files=files)
+                if response.status_code == 200:
+                    generated_itinerary = response.json()
+                    st.success('Itinerary generated successfully!')
+                    markdown_data = dict_to_markdown(generated_itinerary)
+                    html_data = dict_to_html(generated_itinerary)
+                    st.markdown(html_data, unsafe_allow_html=True)
+                else:
+                    st.error('Error generating itinerary from preferences.')
+        else:
+            st.warning('Please upload a valid preferences file.')
+
+elif mode == 'Community Itineraries':
     st.subheader("Explore Community Itineraries")
 
-    # Search bar for destinations or activities
-    search_query = st.text_input("Search for itineraries by destination or activity:")
-    
-    # Example of filter options for the community feed
-    filters = st.multiselect(
-        "Filter by Travel Type", ["Leisure", "Adventure", "Cultural", "Romantic", "Business"]
-    )
+    # Add filters and search functionality for the community feed
+    destination_filter = st.text_input("Search by Destination")
+    travel_type_filter = st.selectbox("Filter by Travel Type", options=["All", "Cultural", "Adventure", "Luxury", "Romantic", "Business"])
 
-    if st.button('Search'):
-        # Dummy search action (could be replaced with real search logic)
-        st.success(f"Showing itineraries matching '{search_query}' with filters {filters}")
-        # Example rendering of community itineraries
-        for i in range(3):  # Assume 3 itineraries are returned
-            st.markdown(f"**Itinerary {i + 1}:** Destination Example")
-            st.markdown("Activities: Museum, Hiking")
-            st.markdown("Budget: $1500")
-            st.button(f"Follow Itinerary {i + 1}")
+    # Filter the community itineraries based on user input
+    filtered_itineraries = [
+        itinerary for itinerary in it.community_itineraries
+        if (destination_filter.lower() in itinerary['destination'].lower()) and
+        (travel_type_filter == "All" or itinerary['travel_type'] == travel_type_filter)
+    ]
+
+    # Display the filtered itineraries
+    st.write(f"Showing {len(filtered_itineraries)} itineraries:")
+    for itinerary in filtered_itineraries:
+        with st.expander(f"🌍 {itinerary['destination']} ({itinerary['dates']}) by {itinerary['username']}"):
+            st.write(f"**Travel Type**: {itinerary['travel_type']}")
+            st.write(f"**Budget**: ${itinerary['budget']}")
+            st.write("**Activities**:")
+            for activity in itinerary['activities']:
+                st.write(f"- {activity}")
 
 # Simple dashboard for saved itineraries
-# st.subheader("My Itineraries")
-# st.write("List of saved and followed itineraries")
-
-# Simulating saved and followed itineraries
-saved_itineraries = [
-    {
-        'destination': 'Paris, France',
-        'start_date': '2022-11-01',
-        'end_date': '2022-11-07',
-        'travel_type': 'Cultural',
-        'budget': 3000,
-        'activities': ['Visit Louvre', 'Eiffel Tower Sightseeing', 'Seine River Cruise']
-    },
-    {
-        'destination': 'Tokyo, Japan',
-        'start_date': '2023-12-10',
-        'end_date': '2023-12-15',
-        'travel_type': 'Adventure',
-        'budget': 2000,
-        'activities': ['Mount Fuji Hike', 'Visit Shibuya Crossing', 'Sushi Omakase Tasting']
-    }
-]
-
-followed_itineraries = [
-    {
-        'destination': 'New York, USA',
-        'start_date': '2024-10-19',
-        'end_date': '2024-3-23',
-        'travel_type': 'Business',
-        'budget': 1500,
-        'activities': ['Attend Business Conference', 'Central Park Walk', 'Attend Broadway Show']
-    }
-]
-
 st.write("## My Itineraries")
 
 # Section for Saved Itineraries
 st.write("### Saved Itineraries")
-if saved_itineraries:
+if it.saved_itineraries:
     i = ""
-    for idx, itinerary in enumerate(saved_itineraries):
+    for idx, itinerary in enumerate(it.saved_itineraries):
         i += " "
         with st.expander(f"🗺️ {itinerary['destination']} ({itinerary['start_date']} - {itinerary['end_date']})"):
             st.markdown(f"**Travel Type**: {itinerary['travel_type']}")
@@ -209,8 +200,8 @@ else:
 
 # Section for Followed Itineraries
 st.write("### Followed Itineraries")
-if followed_itineraries:
-    for idx, itinerary in enumerate(followed_itineraries):
+if it.followed_itineraries:
+    for idx, itinerary in enumerate(it.followed_itineraries):
         with st.expander(f"📍 {itinerary['destination']} ({itinerary['start_date']} - {itinerary['end_date']})"):
             st.markdown(f"**Travel Type**: {itinerary['travel_type']}")
             st.markdown(f"**Budget**: ${itinerary['budget']}")
@@ -236,21 +227,6 @@ if notifications:
         st.write(notification)
 else:
     st.write("No new notifications.")
-
-# Main content: Community Feed
-st.title("Community Itineraries")
-st.subheader("Explore Itineraries Shared by the Lhasa Community")
-
-# Loop through example itineraries and display them in expandable cards
-for itinerary in feed.community_itineraries:
-    with st.expander(f"🌍 {itinerary['destination']} ({itinerary['dates']}) by {itinerary['username']}"):
-        st.write(f"**Travel Type**: {itinerary['travel_type']}")
-        st.write(f"**Budget**: ${itinerary['budget']}")
-        st.write("**Activities**:")
-        for activity in itinerary['activities']:
-            st.write(f"- {activity}")
-        if st.button(f"Follow {itinerary['username']}'s Itinerary", key=itinerary['username']):
-            st.success(f"You are now following {itinerary['username']}'s itinerary!")
 
 
 # for backend
