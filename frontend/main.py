@@ -13,7 +13,7 @@ def dict_to_html(d, level=0):
 
 # Set page configuration
 st.set_page_config(
-    page_title="Lhasa Itinerary Planner",
+    page_title="Lhasa",
     page_icon="🗺️",
     layout="centered",
     initial_sidebar_state="auto",
@@ -23,8 +23,31 @@ st.set_page_config(
 if 'uploaded_file' not in st.session_state:
     st.session_state['uploaded_file'] = None
 
+# Sidebar for login/logout
+with st.sidebar:
+    st.title("User Login")
+    
+    # Simulate a login/logout button with session state
+    if 'logged_in' not in st.session_state:
+        st.session_state['logged_in'] = False
+
+    if st.session_state['logged_in']:
+        st.sidebar.success("Logged in as User")
+        if st.sidebar.button("Logout"):
+            st.session_state['logged_in'] = False
+            st.sidebar.warning("You have logged out.")
+    else:
+        username = st.sidebar.text_input("Username")
+        password = st.sidebar.text_input("Password", type="password")
+        if st.sidebar.button("Login"):
+            if username == "admin" and password == "password":  # Replace with real authentication
+                st.session_state['logged_in'] = True
+                st.sidebar.success("Login successful!")
+            else:
+                st.sidebar.error("Invalid credentials")
+
 # Title of the app
-st.title(":mountain: :green[**Lhasa**] AI-Powered Travel Itinerary Planner")
+st.title(":mountain: :green[**Lhasa**] Smart Travel Hub")
 
 st.markdown("""
 **Plan your perfect trip** with Lhasa's AI-driven itinerary generator. Whether you're planning a weekend getaway or a multi-country adventure, Lhasa helps you create a customized and memorable travel experience.
