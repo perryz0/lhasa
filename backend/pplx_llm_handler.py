@@ -1,6 +1,5 @@
 # Import necessary libraries
 import requests
-import json
 
 class PerplexityLLMHandler:
     def __init__(self, api_key, use_mock=False):
@@ -53,29 +52,28 @@ class PerplexityLLMHandler:
             else:
                 raise Exception(f"API call failed: {response.status_code} - {response.text}")
         
-        # Process and parse the text response into three JSON objects
-        parsed_itineraries = self.parse_response(response['data'])
-        return parsed_itineraries
+        # If it's a mock response, we don't need parsing
+        if self.use_mock:
+            return response['data']  # The mock data is already a list
+        else:
+            # For real responses, we need to parse the raw text data
+            return self.parse_response(response['data'])
 
     def parse_response(self, text_data):
-        """Parses the Perplexity response into three distinct itinerary JSONs."""
-        # Example parsing logic - assumes you can identify start/end points of each itinerary
+        """Parse the raw response text and split into three itineraries."""
+        # This parsing logic is for the real API response where the output might be a single text
         itineraries = text_data.split('Mid-Range Itinerary')  # Split based on keywords like "Mid-Range Itinerary"
+        if len(itineraries) < 3:
+            raise ValueError("Failed to extract three itineraries.")
         
-        itinerary_1 = {
-            "itinerary": itineraries[0].strip(),
-            "option": "Budget-Friendly Itinerary"
-        }
-        itinerary_2 = {
-            "itinerary": itineraries[1].strip(),
-            "option": "Mid-Range Itinerary"
-        }
-        itinerary_3 = {
-            "itinerary": itineraries[2].strip(),
-            "option": "Luxury History Buff Itinerary"
-        }
-
-        return [itinerary_1, itinerary_2, itinerary_3]
+        # Create the structured JSON objects for each itinerary
+        parsed_itineraries = []
+        for i, itinerary in enumerate(itineraries):
+            parsed_itineraries.append({
+                'option': f'Itinerary Option {i+1}',
+                'details': itinerary.strip()  # Remove leading/trailing spaces
+            })
+        return parsed_itineraries
 
     def mock_response(self, preferences):
         """Mock function to simulate a successful API call returning three itinerary options."""
@@ -122,7 +120,6 @@ class PerplexityLLMHandler:
             'message': 'Mock response successful!'
         }
         return mock_data
-
 
 # Example of using the handler in a Streamlit app or test case
 def generate_itinerary_from_profile(destination, start_date, end_date, interests, travel_type, budget,
