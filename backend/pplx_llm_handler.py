@@ -21,12 +21,12 @@ class PerplexityLLMHandler:
             "messages": [
                 {
                     "role": "system",
-                    "content": "Generate an optimal travel itinerary based on the user preferences."
+                    "content": "Generate three different travel itinerary options based on the user preferences."
                 },
                 {
                     "role": "user",
                     "content": (
-                        f"Generate a travel itinerary for {preferences.get('destination')} from "
+                        f"Generate three travel itinerary options for {preferences.get('destination')} from "
                         f"{preferences.get('start_date')} to {preferences.get('end_date')} with interests "
                         f"in {', '.join(preferences.get('interests', []))} and a budget of {preferences.get('budget')}."
                     )
@@ -52,30 +52,51 @@ class PerplexityLLMHandler:
             else:
                 raise Exception(f"API call failed: {response.status_code} - {response.text}")
         
-        # Return the generated itinerary from the response
+        # Return the generated itineraries from the response
         return response['data']
 
     def mock_response(self, preferences):
-        """Mock function to simulate a successful API call."""
+        """Mock function to simulate a successful API call returning three itinerary options."""
         mock_data = {
             'status_code': 200,
-            'data': {
-                'destination': preferences.get('destination', 'Unknown Destination'),
-                'start_date': preferences.get('start_date', 'Unknown Start Date'),
-                'end_date': preferences.get('end_date', 'Unknown End Date'),
-                'itinerary': [
-                    {
-                        'day': 1,
-                        'activities': ['Visit museum', 'Walk around old town', 'Dinner at local restaurant']
-                    },
-                    {
-                        'day': 2,
-                        'activities': ['Hiking', 'Explore the park', 'Visit a gallery']
-                    }
-                ],
-                'budget': preferences.get('budget', 'Unknown Budget'),
-                'interests': preferences.get('interests', 'Unknown Interests'),
-            },
+            'data': [
+                {
+                    'destination': preferences.get('destination', 'Unknown Destination'),
+                    'start_date': preferences.get('start_date', 'Unknown Start Date'),
+                    'end_date': preferences.get('end_date', 'Unknown End Date'),
+                    'itinerary': [
+                        {'day': 1, 'activities': ['Visit museum', 'Walk around old town', 'Dinner at local restaurant']},
+                        {'day': 2, 'activities': ['Hiking', 'Explore the park', 'Visit a gallery']}
+                    ],
+                    'budget': preferences.get('budget', 'Unknown Budget'),
+                    'interests': preferences.get('interests', 'Unknown Interests'),
+                    'option': 'Itinerary Option 1'
+                },
+                {
+                    'destination': preferences.get('destination', 'Unknown Destination'),
+                    'start_date': preferences.get('start_date', 'Unknown Start Date'),
+                    'end_date': preferences.get('end_date', 'Unknown End Date'),
+                    'itinerary': [
+                        {'day': 1, 'activities': ['City tour', 'Lunch at cafe', 'Visit local market']},
+                        {'day': 2, 'activities': ['Beach day', 'Boat tour']}
+                    ],
+                    'budget': preferences.get('budget', 'Unknown Budget'),
+                    'interests': preferences.get('interests', 'Unknown Interests'),
+                    'option': 'Itinerary Option 2'
+                },
+                {
+                    'destination': preferences.get('destination', 'Unknown Destination'),
+                    'start_date': preferences.get('start_date', 'Unknown Start Date'),
+                    'end_date': preferences.get('end_date', 'Unknown End Date'),
+                    'itinerary': [
+                        {'day': 1, 'activities': ['Museum tour', 'Lunch at a riverside restaurant']},
+                        {'day': 2, 'activities': ['Hiking in nearby hills', 'Dinner at a fancy restaurant']}
+                    ],
+                    'budget': preferences.get('budget', 'Unknown Budget'),
+                    'interests': preferences.get('interests', 'Unknown Interests'),
+                    'option': 'Itinerary Option 3'
+                }
+            ],
             'message': 'Mock response successful!'
         }
         return mock_data
@@ -96,6 +117,6 @@ def generate_itinerary_from_profile(api_key, destination, start_date, end_date, 
         'budget': budget
     }
 
-    # Call the function to get the itinerary from Perplexity API (mocked or real based on `use_mock`)
-    itinerary = handler.get_itinerary(preferences)
-    return itinerary
+    # Call the function to get the itineraries from Perplexity API (mocked or real based on `use_mock`)
+    itineraries = handler.get_itinerary(preferences)
+    return itineraries
