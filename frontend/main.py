@@ -161,14 +161,18 @@ elif mode == 'Community Itineraries':
     ]
 
     # Display the filtered itineraries
-    st.write(f"Showing {len(filtered_itineraries)} itineraries:")
+    top = min(len(filtered_itineraries), 5)
+    st.write(f"Showing {top} out of {len(filtered_itineraries)} itineraries:")
+    i = 0
     for itinerary in filtered_itineraries:
-        with st.expander(f"🌍 {itinerary['destination']} ({itinerary['dates']}) by {itinerary['username']}"):
-            st.write(f"**Travel Type**: {itinerary['travel_type']}")
-            st.write(f"**Budget**: ${itinerary['budget']}")
-            st.write("**Activities**:")
-            for activity in itinerary['activities']:
-                st.write(f"- {activity}")
+        if (i < top):
+            with st.expander(f"🌍 {itinerary['destination']} ({itinerary['dates']}) by {itinerary['username']}"):
+                st.write(f"**Travel Type**: {itinerary['travel_type']}")
+                st.write(f"**Budget**: ${itinerary['budget']}")
+                st.write("**Activities**:")
+                for activity in itinerary['activities']:
+                    st.write(f"- {activity}")
+            i += 1
 
 # Simple dashboard for saved itineraries
 st.write("## My Itineraries")
