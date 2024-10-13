@@ -131,7 +131,74 @@ if mode == 'Start from scratch':
                     # Option to save itinerary to the community feed
                     if share_itinerary:
                         st.success("Your itinerary has been shared with the community!")
-                        
+
+                    # Show example itineraries after successful generation
+                    st.markdown("### Example Itineraries You May Like")
+                    
+                    # Example itineraries
+                    example_itineraries = [
+                        {
+                            'username': 'dubai_explorer',
+                            'destination': 'Dubai, UAE',
+                            'dates': '2024-05-10 to 2024-05-15',
+                            'budget': 2500,
+                            'travel_type': 'Adventure',
+                            'activities': ['Visit Burj Khalifa', 'Desert Safari with Dune Bashing & Camel Ride', 'Dhow Cruise on Dubai Creek']
+                        },
+                        {
+                            'username': 'parisian_lover',
+                            'destination': 'Paris, France',
+                            'dates': '2024-06-01 to 2024-06-07',
+                            'budget': 4000,
+                            'travel_type': 'Romantic',
+                            'activities': ['Visit Eiffel Tower', 'Louvre Museum', 'Seine River Dinner Cruise']
+                        },
+                        {
+                            'username': 'tokyo_adventurer',
+                            'destination': 'Tokyo, Japan',
+                            'dates': '2024-07-15 to 2024-07-22',
+                            'budget': 3000,
+                            'travel_type': 'Cultural',
+                            'activities': ['Visit Shibuya Crossing', 'Explore Meiji Shrine', 'Day Trip to Mount Fuji']
+                        }
+                    ]
+                    
+                    # Use columns to line up the three example itineraries
+                    col1, col2, col3 = st.columns(3)
+
+                    # First itinerary
+                    with col1:
+                        st.subheader(f"{example_itineraries[0]['destination']}")
+                        st.write(f"**Dates**: {example_itineraries[0]['dates']}")
+                        st.write(f"**Budget**: ${example_itineraries[0]['budget']}")
+                        st.write(f"**Type**: {example_itineraries[0]['travel_type']}")
+                        st.write("**Activities**:")
+                        for activity in example_itineraries[0]['activities']:
+                            st.write(f"- {activity}")
+                        st.button(f"Choose {example_itineraries[0]['destination']} Itinerary")
+
+                    # Second itinerary
+                    with col2:
+                        st.subheader(f"{example_itineraries[1]['destination']}")
+                        st.write(f"**Dates**: {example_itineraries[1]['dates']}")
+                        st.write(f"**Budget**: ${example_itineraries[1]['budget']}")
+                        st.write(f"**Type**: {example_itineraries[1]['travel_type']}")
+                        st.write("**Activities**:")
+                        for activity in example_itineraries[1]['activities']:
+                            st.write(f"- {activity}")
+                        st.button(f"Choose {example_itineraries[1]['destination']} Itinerary")
+
+                    # Third itinerary
+                    with col3:
+                        st.subheader(f"{example_itineraries[2]['destination']}")
+                        st.write(f"**Dates**: {example_itineraries[2]['dates']}")
+                        st.write(f"**Budget**: ${example_itineraries[2]['budget']}")
+                        st.write(f"**Type**: {example_itineraries[2]['travel_type']}")
+                        st.write("**Activities**:")
+                        for activity in example_itineraries[2]['activities']:
+                            st.write(f"- {activity}")
+                        st.button(f"Choose {example_itineraries[2]['destination']} Itinerary")
+                                
                 else:
                     st.error("Itinerary generation failed. Please try again.")
 
