@@ -156,7 +156,7 @@ if mode == 'Start from scratch':
             # Call the Perplexity LLM handler here
             try:
                 itinerary = generate_itinerary_from_profile(
-                    api_key="pplx-e0a9601780b78e0825c85b74f452b79dd794f43a5239a8130",  # Your actual API key
+                    api_key="",  # Your actual API key: revoked for security reasons
                     destination=travel_data['destination'],
                     start_date=travel_data['start_date'],
                     end_date=travel_data['end_date'],
