@@ -1,5 +1,5 @@
 # lhasa
-Lhasa, a city known for its religious significance as a hub for pilgrims, is a smart LLM-powered itinerary generator and social platform that connects like-minded explorers. The platform offers personalized travel itineraries and allows users to share their plans with others, creating opportunities for connection and shared experiences. By fostering a community of travelers, Lhasa helps transform individual trips into meaningful journeys. The name reflects its mission to inspire memorable and impactful travel.
+Lhasa, a city known for its religious significance as a hub for pilgrims, is a smart LLM-powered itinerary generator and social platform that connects like-minded explorers. The platform offers personalized travel itineraries and allows users to share their plans with others, creating opportunities for connection and shared experiences. By fostering a community of travelers, Lhasa helps transform individual trips into meaningful journeys. The name reflects its mission to inspire memorable and impactful travel. [GPT cooked this summary fr]
 
 ## Tasks
 - ~~Frontend design~~
